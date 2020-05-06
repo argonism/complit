@@ -21,9 +21,13 @@ chrome.browserAction.onClicked.addListener(function(){
 
 function combine() {
     if (winHistory.some(function(id){return id == -1;})) return;
-    chrome.windows.get(winHistory[0], {populate: true}, function(lastWin){
-        var tabIds = lastWin.tabs.map(function(tab){return tab.id;});
-        chrome.tabs.move(tabIds, {windowId: winHistory[1], index: -1});
+    var tabIds = []
+    chrome.tabs.query({highlighted: true, windowId: winHistory[0]}, function(tabs){
+        tabIds = tabs.map(tab => { return tab.id;});
+    });
+    
+    chrome.windows.get(winHistory[1], {populate: true}, function(lastWin){
+        chrome.tabs.move(tabIds, {windowId: lastWin.id, index: -1});
     });
 }
 
